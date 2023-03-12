@@ -1,20 +1,22 @@
 let db = require('../config/database');
 
-class Service {
+class Tip {
 
     constructor(d) {
         if(d == null) {
             this._id = null
             this.created = null
             this._modified = null
-            this._shiftType = null
-            this._shiftClosed = null
+            this._tips = null
+            this._table = null
+            this._service = null
         } else {
             this._id = d.id
             this.created = d.created
             this._modified = d.modified
-            this._shiftType = d.shiftType
-            this._shiftClosed = d.shiftClosed
+            this._tips = d.tips
+            this._table = d.table
+            this._service = d.service
         }
     }
 
@@ -28,11 +30,14 @@ class Service {
     get modified() {
         return this._modified
     }
-    get shiftType() {
-        return this._shiftType
+    get tips() {
+        return this._tips
     }
-    get shiftClosed() {
-        return this._shiftClosed
+    get table() {
+        return this._table
+    }
+    get service() {
+        return this._service
     }
 
 
@@ -46,15 +51,18 @@ class Service {
     set modified(x) {
         this._modified = x
     }
-    set shiftType(x) {
-        this._shiftType = x
+    set tips(x) {
+        this._tips = x
     }
-    set shiftClosed(x) {
-        this._shiftClosed = x
+    set table(x) {
+        this._table = x
+    }
+    set service(x) {
+        this._service = x
     }
 
 
     // methods
 
 }
-module.exports = Service
+module.exports = Tip
