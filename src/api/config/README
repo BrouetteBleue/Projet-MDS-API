@@ -1,0 +1,9 @@
+Variables d'env et config
+
+Pour utiliser une variable d'environnement dans le projet , il faut la définire dans le fichier .env a la racine
+puis rajouter son type dans l'interface ProcessEnv du fichier global.d.ts
+ensuite définir son type dans les interfaces "ENV" et "Config" du fichier config.ts
+ne pas oublier de charger la valeur de la variable (définie dans le fichier .env) dans la fonction getConfig du fichier config.ts 
+
+les variables seront utilisables et autocompletables via l'import du fichier config.ts dans les fichier concernés 
+comme ceci config.MaVariable
