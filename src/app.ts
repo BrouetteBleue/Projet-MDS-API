@@ -19,6 +19,13 @@ const pipi = config.PORT;
 server.use(express.urlencoded());
 server.use(express.json());
 
+const serviceRoute = require("./api/routes/serviceRoute");
+serviceRoute(server);
+
+const userRoute = require("./api/routes/userRoute");
+userRoute(server);
+
+
 server.listen(port, hostname, () => {
     console.log("environnement de node = "+pipi);
 }) 

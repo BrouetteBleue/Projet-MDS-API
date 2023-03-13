@@ -86,5 +86,64 @@ class User {
 
     // methods
 
+    // get all users
+    static getAllUsers(callback: Function) {
+
+            db.query('SELECT * FROM users', (err, result) => {
+                if(err) {
+                    callback(err, null)
+                } else {
+                    callback(null, result)
+                }
+            })
+
+    }
+
+    // get user by id
+    static getUserById(id: number) {
+        return new Promise((resolve, reject) => {
+            db.query('SELECT * FROM users WHERE id = ?', [id], (err, result) => {
+                if (err) reject(err)
+                resolve(result)
+            })
+        })
+    }
+
+    // create user
+    static createUser(user: User, callback: Function) {
+
+            // db.query('INSERT INTO users SET ?', [user], (err, result) => {
+            // db query to insert user
+            db.query('INSERT INTO users (firstname, lastname, status, active) VALUES (?, ?, ?, ?)', [user.firstname, user.lastname, user.status, user.active], (err, result) => {
+                if(err) {
+                    callback(err, null)
+                } else {
+                    callback(null, result)
+                }
+            })
+
+    }
+
+    // update user
+    static updateUser(user: User) {
+        return new Promise((resolve, reject) => {
+            db.query('UPDATE users SET ? WHERE id = ?', [user, user.id], (err, result) => {
+                if (err) reject(err)
+                resolve(result)
+            })
+        })
+    }
+
+    // delete user
+    static deleteUser(id: number) {
+        return new Promise((resolve, reject) => {
+            db.query('DELETE FROM users WHERE id = ?', [id], (err, result) => {
+                if (err) reject(err)
+                resolve(result)
+            })
+        })
+    }
+
+
 }
 export { User }

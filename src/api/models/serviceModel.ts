@@ -74,5 +74,96 @@ class Service {
 
     // methods
 
+    // get all services
+    static getAllServices(callback: Function) {
+        db.query('SELECT * FROM services', (err, result) => {
+            if(err) {
+                callback(err, null)
+            } else {
+                callback(null, result)
+            }
+        })
+    }
+
+    // get all services TEST
+    // static getAllServicesTest(callback: Function) {
+    //     db.query('SELECT * FROM services', (err, result) => {
+    //         if(err) {
+    //             callback(err, null)
+    //         } else {
+    //             db.query('SELECT * FROM users', (err, result2) => {
+    //                 if(err) {
+    //                     callback(err, null)
+    //                 } else {
+    //                     let services: Service[] = []
+    //                     for(let i = 0; i < result.length; i++) {
+    //                         let service = new Service(result[i])
+    //                         let users: User[] = []
+    //                         for(let j = 0; j < result2.length; j++) {
+    //                             let user = new User(result2[j])
+    //                             if(user.serviceId == service.id) {
+    //                                 users.push(user)
+    //                             }
+    //                         }
+    //                         service.users = users
+    //                         services.push(service)
+    //                     }
+    //                     callback(null, services)
+    //                 }
+    //             })
+            
+    //             callback(null, result)
+    //         }
+    //     })
+    // }
+
+
+    // get service by id
+
+    static getServiceById(id: number, callback: Function) {
+        db.query('SELECT * FROM services WHERE id = ?', [id], (err, result) => {
+            if(err) {
+                callback(err, null)
+            } else {
+                callback(null, result)
+            }
+        })
+    }
+
+    // create service
+    static createService(service: Service, callback: Function) {
+        db.query('INSERT INTO services SET ?', [service], (err, result) => {
+            if(err) {
+                callback(err, null)
+            } else {
+                callback(null, result)
+            }
+        })
+    }
+
+    // update service
+    static updateService(service: Service, callback: Function) {
+        db.query('UPDATE services SET ? WHERE id = ?', [service, service.id], (err, result) => {
+            if(err) {
+                callback(err, null)
+            } else {
+                callback(null, result)
+            }
+        })
+    }
+
+    // delete service
+    static deleteService(id: number, callback: Function) {
+        db.query('DELETE FROM services WHERE id = ?', [id], (err, result) => {
+            if(err) {
+                callback(err, null)
+            } else {
+                callback(null, result)
+            }
+        })
+    }
+
+
+
 }
 export {Service}
