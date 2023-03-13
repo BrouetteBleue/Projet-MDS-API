@@ -2,10 +2,10 @@
   "name": "app",
   "version": "1.0.0",
   "description": "",
-  "main": "app.js",
+  "main": "app.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon  app.js"
+    "start": "nodemon app.ts"
   },
   "author": "",
   "license": "ISC",
@@ -14,7 +14,11 @@
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "mysql": "^2.18.1",
-    "nodemon": "^2.0.21",
     "typescript": "^4.9.5"
+  },
+  "devDependencies": {
+    "@types/mysql": "^2.15.21",
+    "@types/node": "^18.15.0",
+    "nodemon": "^2.0.21"
   }
 }

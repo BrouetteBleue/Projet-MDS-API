@@ -1,8 +1,17 @@
-let db = require('../config/database');
+import { db } from '../config/database'
+import { Table } from './tableModel'
+import { Service } from './serviceModel'
 
-class Tip {
+class TableTip {
 
-    constructor(d) {
+    private _id: number | null
+    private _created: Date | null
+    private _modified: Date | null
+    private _tips: number | null
+    private _table: Table | null
+    private _service: Service | null
+
+    constructor(d : TableTip) {
         if(d == null) {
             this._id = null
             this.created = null
@@ -21,43 +30,43 @@ class Tip {
     }
 
     // getters
-    get id() {
+    get id() : number | null{
         return this._id
     }
-    get created() {
+    get created() : Date | null {
         return this._created
     }
-    get modified() {
+    get modified() : Date | null {
         return this._modified
     }
-    get tips() {
+    get tips() : number | null {
         return this._tips
     }
-    get table() {
+    get table() : Table | null {
         return this._table
     }
-    get service() {
+    get service() : Service | null {
         return this._service
     }
 
 
     // setters (x = value)
-    set id(x) {
+    set id(x : number | null) {
         this._id = x
     }
-    set created(x) {
+    set created(x : Date | null) {
         this._created = x
     }
-    set modified(x) {
+    set modified(x : Date | null) {
         this._modified = x
     }
-    set tips(x) {
+    set tips(x : number | null) {
         this._tips = x
     }
-    set table(x) {
+    set table(x : Table | null) {
         this._table = x
     }
-    set service(x) {
+    set service(x : Service | null) {
         this._service = x
     }
 
@@ -65,4 +74,4 @@ class Tip {
     // methods
 
 }
-module.exports = Tip
+export {TableTip}

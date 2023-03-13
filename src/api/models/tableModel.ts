@@ -1,29 +1,25 @@
 import { db } from '../config/database'
-import { User } from './userModel'
 
-class TipPayment {
+class Table {
 
     // properties
     private _id: number | null
     private _created: Date | null
     private _modified: Date | null
-    private _amount: number | null
-    private _user: User | null
+    private _name: string | null
 
 
-    constructor(d: TipPayment) {
+    constructor(d: Table) {
         if(d == null) {
             this._id = null
             this._created = null
             this._modified = null
-            this._amount = null
-            this._user = null
+            this._name = null
         } else {
             this._id = d.id
             this.created = d.created
             this._modified = d.modified
-            this._amount = d.amount
-            this._user = d.user
+            this._name = d.name
         }
     }
 
@@ -37,11 +33,8 @@ class TipPayment {
     get modified() : Date | null {
         return this._modified
     }
-    get amount() : number | null {
-        return this._amount
-    }
-    get user() : User | null {
-        return this._user
+    get name() : string | null {
+        return this._name
     }
 
 
@@ -57,11 +50,8 @@ class TipPayment {
     set modified(x : Date | null) {
         this._modified = x
     }
-    set amount(x : number | null) {
-        this._amount = x
-    }
-    set user(x : User | null) {
-        this._user = x
+    set name(x : string | null) {
+        this._name = x
     }
 
 
@@ -69,4 +59,4 @@ class TipPayment {
     // methods
 
 }
-export {TipPayment} 
+export { Table }

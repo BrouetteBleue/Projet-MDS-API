@@ -1,0 +1,8 @@
+{
+    "compilerOptions": {
+        "typeRoots": ["config/global.d.ts", "./node_modules/@types"],
+        "esModuleInterop": true
+    },
+  "include": ["api/**/*"],
+  "exclude": ["node_modules", "**/*.spec.ts"]
+}
