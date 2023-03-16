@@ -73,5 +73,17 @@ class TableTip {
 
     // methods
 
+    static getAll = async (callback: Function) => {
+
+        db.query('SELECT * FROM tabletips', (err, result) => {
+            if(err) {
+                console.error(err)
+            } else {
+                return result
+            }
+        })
+
+    }
+
 }
 export {TableTip}
