@@ -13,7 +13,7 @@ class User {
 
 
     constructor(d: User | null) {
-        if(d == null) {
+        if (d == null) {
             this._id = null
             this._created = null
             this._modified = null
@@ -33,25 +33,25 @@ class User {
     }
 
     // getters
-    get id() : number | null {
+    get id(): number | null {
         return this._id
     }
-    get created() : Date | null {
+    get created(): Date | null {
         return this._created
     }
-    get modified() : Date | null {
+    get modified(): Date | null {
         return this._modified
     }
-    get firstname() : string | null {
+    get firstname(): string | null {
         return this._firstname
     }
-    get lastname() : string | null {
+    get lastname(): string | null {
         return this._lastname
     }
-    get status() : boolean | null {
+    get status(): boolean | null {
         return this._status
     }
-    get active() : boolean | null {
+    get active(): boolean | null {
         return this._active
     }
 
@@ -66,19 +66,19 @@ class User {
     set created(x: Date | null) {
         this._created = x
     }
-    set modified(x : Date | null) {
+    set modified(x: Date | null) {
         this._modified = x
     }
-    set firstname(x : string | null) {
+    set firstname(x: string | null) {
         this._firstname = x
     }
-    set lastname(x : string | null) {
+    set lastname(x: string | null) {
         this._lastname = x
     }
-    set status(x : boolean | null) {
+    set status(x: boolean | null) {
         this._status = x
     }
-    set active(x : boolean | null) {
+    set active(x: boolean | null) {
         this._active = x
     }
 
@@ -89,13 +89,13 @@ class User {
     // get all users
     static getAllUsers(callback: Function) {
 
-            db.query('SELECT * FROM users', (err, result) => {
-                if(err) {
-                    callback(err, null)
-                } else {
-                    callback(null, result)
-                }
-            })
+        db.query('SELECT * FROM users', (err, result) => {
+            if (err) {
+                callback(err, null)
+            } else {
+                callback(null, result)
+            }
+        })
 
     }
 
@@ -112,30 +112,32 @@ class User {
     // create user
     static createUser(user: User, callback: Function) {
 
-            // db.query('INSERT INTO users SET ?', [user], (err, result) => {
-            // db query to insert user
-            db.query('INSERT INTO users (firstname, lastname, status, active) VALUES (?, ?, ?, ?)', [user.firstname, user.lastname, user.status, user.active], (err, result) => {
-                if(err) {
-                    callback(err, null)
-                } else {
-                    callback(null, result)
-                }
-            })
+        // db.query('INSERT INTO users SET ?', [user], (err, result) => {
+        // db query to insert user
+        db.query('INSERT INTO users (firstname, lastname, status, active) VALUES (?, ?, ?, ?)', [user.firstname, user.lastname, user.status, user.active], (err, result) => {
+            if (err) {
+                callback(err, null)
+            } else {
+                callback(null, result)
+            }
+        })
 
     }
 
     // update user
-    static updateUser(user: User) {
+    static updateUser(user: User, callback: Function) {
         return new Promise((resolve, reject) => {
             db.query('UPDATE users SET ? WHERE id = ?', [user, user.id], (err, result) => {
-                if (err) reject(err)
+                if (err) {
+                    reject(err)
+                }
                 resolve(result)
             })
         })
     }
 
-    // delete user
-    static deleteUser(id: number) {
+    // // delete user
+    static deleteUser(id: number, callback: Function) {
         return new Promise((resolve, reject) => {
             db.query('DELETE FROM users WHERE id = ?', [id], (err, result) => {
                 if (err) reject(err)
