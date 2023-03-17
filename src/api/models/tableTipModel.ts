@@ -9,7 +9,7 @@ class TableTip {
     private _modified: Date | null
     private _tips: number | null
     private _table: Table | null
-    private _service: Service | null
+    private _service: number | null
 
     constructor(d : TableTip) {
         if(d == null) {
@@ -45,7 +45,7 @@ class TableTip {
     get table() : Table | null {
         return this._table
     }
-    get service() : Service | null {
+    get service() : number | null {
         return this._service
     }
 
@@ -66,7 +66,7 @@ class TableTip {
     set table(x : Table | null) {
         this._table = x
     }
-    set service(x : Service | null) {
+    set service(x : number | null) {
         this._service = x
     }
 
@@ -77,13 +77,60 @@ class TableTip {
 
         db.query('SELECT * FROM tabletips', (err, result) => {
             if(err) {
-                console.error(err)
+                callback(err, null)
             } else {
-                return result
+                callback(null, result)
             }
         })
 
     }
 
+    static getOneTableTip = async (id: number, callback: Function) => {
+
+        db.query('SELECT * FROM tabletips WHERE id = ?', [id], (err, result) => {
+            if(err) {
+                callback(err, null)
+            } else {
+                callback(null, result)
+            }
+        })
+
+    }
+
+    static createTableTip = async (newTableTip: TableTip, callback: Function) => {
+            
+            db.query('INSERT INTO tabletips SET ?', [newTableTip], (err, result) => {
+                if(err) {
+                    callback(err, null)
+                } else {
+                    callback(null, result)
+                }
+            })
+    
+        }
+
+    static updateTableTip = async (id: number, updatedTableTip: TableTip, callback: Function) => {
+            
+            db.query('UPDATE tabletips SET ? WHERE id = ?', [updatedTableTip, id], (err, result) => {
+                if(err) {
+                    callback(err, null)
+                } else {
+                    callback(null, result)
+                }
+            })
+    
+        }
+
+    static deleteTableTip = async (id: number, callback: Function) => {
+
+        db.query('DELETE FROM tabletips WHERE id = ?', [id], (err, result) => {
+            if(err) {
+                callback(err, null)
+            } else {
+                callback(null, result)
+            }
+        })
+
+    }
 }
 export {TableTip}
