@@ -14,14 +14,14 @@ class TableTip {
     constructor(d : TableTip) {
         if(d == null) {
             this._id = null
-            this.created = null
+            this._created = null
             this._modified = null
             this._tips = null
             this._table = null
             this._service = null
         } else {
             this._id = d.id
-            this.created = d.created
+            this._created = d.created
             this._modified = d.modified
             this._tips = d.tips
             this._table = d.table
@@ -73,9 +73,9 @@ class TableTip {
 
     // methods
 
-    static getAll = async (callback: Function) => {
+    static getAllTableTips = async (callback: Function) => {
 
-        db.query('SELECT * FROM tabletips', (err, result) => {
+        db.query('SELECT * FROM tableTips JOIN restauranttable ON tableTips.id_restaurantTable = restaurantTable.id JOIN services ON tableTips.id_service = services.id', (err, result) => {
             if(err) {
                 callback(err, null)
             } else {
@@ -97,9 +97,10 @@ class TableTip {
 
     }
 
+
     static createTableTip = async (newTableTip: TableTip, callback: Function) => {
             
-            db.query('INSERT INTO tabletips SET ?', [newTableTip], (err, result) => {
+            db.query('INSERT INTO tabletips (tips, id_restaurantTable, id_service) VALUES (?, ?, ?)', [newTableTip.tips, newTableTip.table, newTableTip.service], (err: Error, result: TableTip) => {
                 if(err) {
                     callback(err, null)
                 } else {
@@ -111,7 +112,7 @@ class TableTip {
 
     static updateTableTip = async (id: number, updatedTableTip: TableTip, callback: Function) => {
             
-            db.query('UPDATE tabletips SET ? WHERE id = ?', [updatedTableTip, id], (err, result) => {
+            db.query('UPDATE tabletips SET tips = ?, id_restaurantTable = ?, id_service = ? WHERE id = ?', [updatedTableTip.tips, updatedTableTip.table, updatedTableTip.service, id], (err, result) => {
                 if(err) {
                     callback(err, null)
                 } else {
