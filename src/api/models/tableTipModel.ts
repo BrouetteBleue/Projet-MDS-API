@@ -164,5 +164,19 @@ class TableTip {
         })
 
     }
+
+    // static get sum of ALL tips
+    static getSumOfTips = async (callback: Function) => {        
+        db.query('SELECT SUM(tips) AS total FROM tabletips', (err, result) => {
+            if(err) {
+                callback(err, null, 500)
+            } else {
+                callback(null, result , 200)
+            }
+        })
+    }
+
+    
+
 }
 export {TableTip}

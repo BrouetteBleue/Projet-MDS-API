@@ -1,8 +1,6 @@
 import { TableTip } from "../models/tableTipModel";
 import { Table } from "../models/tableModel";
-import { exit } from "process";
 import apiResponse from "../config/utils";
-import { log } from "console";
 import { HttpStatusCode } from "axios";
 
 exports.findAll = (req, res) => {
@@ -98,6 +96,18 @@ exports.delete = (req , res) => {
             apiResponse(res, status, "Pourboire supprimé avec succès");
         }
 
+    });
+}
+
+// get sum of all tips 
+exports.getSumTips = (req, res) => {
+    TableTip.getSumOfTips((err: Error, sumTips, status: HttpStatusCode) => {
+        if(err){
+            apiResponse(res, status, err.message);
+        }
+        else{
+            apiResponse(res, status, "", sumTips);
+        }
     });
 }
 
