@@ -91,58 +91,68 @@ class User {
 
         db.query('SELECT * FROM users', (err, result) => {
             if (err) {
-                callback(err, null)
+                callback(err, null,500)
             } else {
-                callback(null, result)
+                callback(null, result,200)
             }
         })
 
     }
 
     // get user by id
-    static getUserById(id: number) {
-        return new Promise((resolve, reject) => {
-            db.query('SELECT * FROM users WHERE id = ?', [id], (err, result) => {
-                if (err) reject(err)
-                resolve(result)
-            })
+    static getUserById = async (id: number, callback: Function) => {
+        db.query('SELECT * FROM users WHERE id = ?', [id], (err, result) => {
+            if(err){
+                callback(err, null,500)
+            }
+            else if(result.length == 0) {
+                callback(new Error("Utilisateur introuvable"), null, 404)
+            }
+            else{
+                callback(null, result,200)
+            }
         })
     }
 
     // create user
     static createUser(user: User, callback: Function) {
-
-        // db.query('INSERT INTO users SET ?', [user], (err, result) => {
-        // db query to insert user
         db.query('INSERT INTO users (firstname, lastname, status, active) VALUES (?, ?, ?, ?)', [user.firstname, user.lastname, user.status, user.active], (err, result) => {
             if (err) {
-                callback(err, null)
+                callback(err, null,500)
             } else {
-                callback(null, result)
+                callback(null, result,201)
             }
         })
 
     }
 
     // update user
-    static updateUser(user: User, callback: Function) {
-        return new Promise((resolve, reject) => {
-            db.query('UPDATE users SET ? WHERE id = ?', [user, user.id], (err, result) => {
-                if (err) {
-                    reject(err)
-                }
-                resolve(result)
-            })
+    static updateUser(id: number , updatedUser: User, callback: Function) {
+        db.query('UPDATE users SET firstname = ?, lastname = ?, status = ?, active = ? WHERE id = ?', [updatedUser._firstname, updatedUser._lastname, updatedUser._status, updatedUser._active, id], (err, result) => {
+            if(err) {
+                callback(err, null,500)
+            }
+            else if(result.affectedRows == 0) {
+                callback(new Error("Utilisateur introuvable"), null, 404)
+            }
+            else{
+                callback(null, result,200)
+            }
         })
     }
 
     // // delete user
     static deleteUser(id: number, callback: Function) {
-        return new Promise((resolve, reject) => {
-            db.query('DELETE FROM users WHERE id = ?', [id], (err, result) => {
-                if (err) reject(err)
-                resolve(result)
-            })
+        db.query('DELETE FROM users WHERE id = ?', [id], (err, result) => {
+            if(err){
+                callback(err,500)
+            }
+            else if(result.affectedRows == 0) {
+                callback(new Error("Utilisateur introuvable"), 404)
+            }
+            else{
+                callback(null,200)
+            }
         })
     }
 

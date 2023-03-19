@@ -2,7 +2,12 @@ module.exports = (server) => {
     const userController = require("../controllers/userController");
 
     server.route("/users")
-    .get(userController.list_all_services)
-    .post(userController.create_a_user);
+    .get(userController.findAll)
+    .post(userController.create);
+
+    server.route("/user/:id")
+    .get(userController.findOne)
+    .put(userController.update)
+    .delete(userController.delete);
 
 }

@@ -1,54 +1,53 @@
 import { User } from '../models/userModel';
+import apiResponse from '../config/utils';
+import { HttpStatusCode } from 'axios';
+import { Request, Response } from 'express';
 
-exports.list_all_services = (req, res) => {
+exports.findAll = (req: Request, res: Response) => {
 
-    User.getAllUsers((err: any, user: User) => {
+    User.getAllUsers((err: Error, user: User, status: HttpStatusCode) => {
         if (err) {
-            res.status(500);
-            console.log(err);
-            res.json({ message: "Erreur Serveur." });
+            apiResponse(res, status, err.message);
         }
         else {
-            res.status(200);
-            res.json(user);
+            apiResponse(res, status, "", user);
         }
-
     });
-
-
 }
 
-exports.list
+exports.findOne = (req: Request, res: Response) => {
+    User.getUserById(req.params.id, (err: Error, user: User, status: HttpStatusCode) => {
+        if (err) {
+            apiResponse(res, status, err.message);
+        }
+        else {
+            apiResponse(res, status, "", user);
+        }
+    });
+}
 
-exports.create_a_user = (req, res) => {
+exports.create = (req: Request, res: Response) => {
     const new_user = new User(req.body);
 
-    User.createUser(new_user, (err: any, user: User) => {
+    User.createUser(new_user, (err: Error, user: User, status: HttpStatusCode) => {
         if (err) {
-            res.status(500);
-            console.log(err);
-            res.json({ message: "Erreur Serveur." });
+            apiResponse(res, status, err.message);
         }
         else {
-            res.status(200);
-            res.json(new_user);
+            apiResponse(res, status, "Utilisateur créé avec succès", new_user);
         }
-
     });
 }
 
-exports.update_a_user = (req, res) => {
-    const old_user = new User(req.body);
+exports.update = (req: Request, res: Response) => {
+    const new_user = new User(req.body);
 
-    User.updateUser(old_user, (err: any, user: User) => {
+    User.updateUser(req.params.id,new_user, (err: Error, user: User, status: HttpStatusCode) => {
         if (err) {
-            res.status(500);
-            console.error(err);
-            res.json({ message: "Erreur Serveur." });
+            apiResponse(res, status, err.message);
         }
         else {
-            res.status(200);
-            res.json(`Utilisateur ${old_user} modifié avec enormement de succes : ${user}`);
+            apiResponse(res, status, "Utilisateur modifié avec succès", new_user);
         }
 
     });
@@ -56,18 +55,13 @@ exports.update_a_user = (req, res) => {
 }
 
 
-exports.delete_a_user = (req, res) => {
-    const user = new User(req.body);
-
-    User.deleteUser(user.id, (err: any, user: User) => {
+exports.delete = (req: Request, res: Response) => {
+    User.deleteUser(req.params.id, (err: Error, status: HttpStatusCode) => {
         if (err) {
-            res.status(500);
-            console.error(err);
-            res.json({ message: "Erreur Serveur." });
+            apiResponse(res, status, err.message);
         }
         else {
-            res.status(200);
-            res.json(`L'utilisateur a bien été supprimé`);
+            apiResponse(res, status, "Utilisateur supprimé avec succès");
         }
 
     });
