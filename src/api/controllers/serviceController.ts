@@ -1,6 +1,7 @@
 import { HttpStatusCode } from 'axios';
 import apiResponse from '../config/utils';
 import { Service } from '../models/serviceModel';
+import { User } from '../models/userModel';
 
 exports.findAll = (req, res) => {
 
@@ -63,4 +64,3 @@ exports.delete = (req, res) => {
         }
     });
 }
-
