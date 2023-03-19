@@ -21,10 +21,7 @@ exports.findAll = (req, res) => {
 
 exports.create = (req, res) => {
     let new_tableTip = new TableTip(req.body);
-
-        // avec une ternaire :
-        //!new_tableTip.tips ?  res.status(400).json({message: "Montant du pourboire requis."}) : !Number.isInteger(new_tableTip.tips) ? res.status(400).json({message: "Veuillez indiquer un nombre entier."}) : null;
-        
+    
         if(!new_tableTip.tips){
             apiResponse(res, 400, "Montant du pourboire requis.");
             return;
@@ -78,6 +75,7 @@ exports.update = (req, res) => {
             apiResponse(res, status, err.message);
         }
         else{
+                // si la modif est ok, on renvoie le nouveau pourboire modifié avec le bon format de données
             TableTip.getOneTableTip(req.params.id, (err: Error, tableTip: TableTip, status: HttpStatusCode) => {
                 if(err){
                     apiResponse(res, status, err.message);
