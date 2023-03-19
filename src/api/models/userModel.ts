@@ -56,9 +56,6 @@ class User {
     }
 
 
-
-
-
     // setters (x = value)
     set id(x: number | null) {
         this._id = x
@@ -86,7 +83,6 @@ class User {
 
     // methods
 
-    // get all users
     static getAllUsers(callback: Function) {
 
         db.query('SELECT * FROM users', (err, result) => {
@@ -99,7 +95,6 @@ class User {
 
     }
 
-    // get user by id
     static getUserById = async (id: number, callback: Function) => {
         db.query('SELECT * FROM users WHERE id = ?', [id], (err, result) => {
             if(err){
@@ -114,7 +109,6 @@ class User {
         })
     }
 
-    // create user
     static createUser(user: User, callback: Function) {
         db.query('INSERT INTO users (firstname, lastname, status, active) VALUES (?, ?, ?, ?)', [user.firstname, user.lastname, user.status, user.active], (err, result) => {
             if (err) {
@@ -126,7 +120,6 @@ class User {
 
     }
 
-    // update user
     static updateUser(id: number , updatedUser: User, callback: Function) {
         db.query('UPDATE users SET firstname = ?, lastname = ?, status = ?, active = ? WHERE id = ?', [updatedUser._firstname, updatedUser._lastname, updatedUser._status, updatedUser._active, id], (err, result) => {
             if(err) {
@@ -141,7 +134,6 @@ class User {
         })
     }
 
-    // // delete user
     static deleteUser(id: number, callback: Function) {
         db.query('DELETE FROM users WHERE id = ?', [id], (err, result) => {
             if(err){
