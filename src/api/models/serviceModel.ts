@@ -78,9 +78,9 @@ class Service {
     static getAllServices(callback: Function) {
         db.query('SELECT * FROM services', (err, result) => {
             if(err) {
-                callback(err, null)
+                callback(err, null, 500)
             } else {
-                callback(null, result)
+                callback(null, result, 200)
             }
         })
     }
@@ -123,9 +123,13 @@ class Service {
     static getServiceById(id: number, callback: Function) {
         db.query('SELECT * FROM services WHERE id = ?', [id], (err, result) => {
             if(err) {
-                callback(err, null)
-            } else {
-                callback(null, result)
+                callback(err, null, 500)
+            }
+            else if(result.length == 0) {
+                callback(new Error("service introuvable"), null, 404)
+            } 
+            else {
+                callback(null, result, 200)
             }
         })
     }
@@ -134,20 +138,25 @@ class Service {
     static createService(service: Service, callback: Function) {
         db.query('INSERT INTO services SET ?', [service], (err, result) => {
             if(err) {
-                callback(err, null)
-            } else {
-                callback(null, result)
+                callback(err, null, 500)
+            }
+            else {
+                callback(null, result, 201)
             }
         })
     }
 
     // update service
-    static updateService(service: Service, callback: Function) {
+    static updateService(id: number, service: Service, callback: Function) {
         db.query('UPDATE services SET ? WHERE id = ?', [service, service.id], (err, result) => {
             if(err) {
-                callback(err, null)
-            } else {
-                callback(null, result)
+                callback(err, null, 500)
+            }
+            else if(result.affectedRows == 0) {
+                    callback(new Error("Ce service n'existe pas"), null, 404)
+                }
+            else {
+                callback(null, result, 200)
             }
         })
     }
@@ -156,9 +165,13 @@ class Service {
     static deleteService(id: number, callback: Function) {
         db.query('DELETE FROM services WHERE id = ?', [id], (err, result) => {
             if(err) {
-                callback(err, null)
-            } else {
-                callback(null, result)
+                callback(err, null, 500)
+            } 
+            else if(result.affectedRows == 0) {
+                callback(new Error("Ce service n'existe pas"), null, 404)
+            }
+            else {
+                callback(null, result, 200)
             }
         })
     }
