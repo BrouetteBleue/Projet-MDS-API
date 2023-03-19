@@ -2,27 +2,28 @@ import { TableTip } from "../models/tableTipModel";
 import { Table } from "../models/tableModel";
 import { exit } from "process";
 import apiResponse from "../config/utils";
+import { log } from "console";
+import { HttpStatusCode } from "axios";
 
-exports.list_all_tableTips = (req, res) => {
-    TableTip.getAllTableTips((err, tableTip: TableTip) => {
-        // if(err){
-        //     console.log(err);
-        //     apiResponse(res, 500, "Erreur Serveur.");
-        // }
-        // else{
-        //     apiResponse(res, 200, "", tableTip);
-        // }
-        err ? apiResponse(res, 500, "Erreur Serveur.")  : apiResponse(res, 200, "", tableTip);
+exports.findAll = (req, res) => {
+    TableTip.getAllTableTips((err: Error, tableTips, status: HttpStatusCode) => {
+        if(err){
+            console.log(err);
+            apiResponse(res, status, err.message);
+        }
+        else{
+            apiResponse(res, status, "", tableTips);
+        }
+       // err ? apiResponse(res, status, err.message)  : apiResponse(res, status, "", tableTip.table = new Table(tableTip.table));
 
     });
 }
 
-exports.create_a_tableTip = (req, res) => {
+exports.create = (req, res) => {
     let new_tableTip = new TableTip(req.body);
 
-  
+        // avec une ternaire :
         //!new_tableTip.tips ?  res.status(400).json({message: "Montant du pourboire requis."}) : !Number.isInteger(new_tableTip.tips) ? res.status(400).json({message: "Veuillez indiquer un nombre entier."}) : null;
-        console.log(req.body); 
         
         if(!new_tableTip.tips){
             apiResponse(res, 400, "Montant du pourboire requis.");
@@ -43,59 +44,60 @@ exports.create_a_tableTip = (req, res) => {
         }
 
 
-        TableTip.createTableTip(new_tableTip, (err, tableTip: TableTip) => {
+        TableTip.createTableTip(new_tableTip, (err: Error, tableTip: TableTip, status: HttpStatusCode) => {
             if(err){
                 console.log(err);
-                apiResponse(res, 500, "Erreur Serveur.");
+                apiResponse(res, status, err.message);
             }
             else{
-                apiResponse(res, 201, "Pourboire inséré avec succès", new_tableTip);
+                apiResponse(res, status, "Pourboire inséré avec succès", new_tableTip);
             }
 
         });
      
 }
 
-exports.read_a_tableTip = (req, res) => {
-    TableTip.getOneTableTip(req.params.id, (err, tableTip: TableTip) => {
+exports.findOne = (req, res) => {
+    TableTip.getOneTableTip(req.params.id, (err: Error, tableTip: TableTip, status: HttpStatusCode) => {
         if(err){
-            res.status(500);
-            console.log(err);
-            res.json({message: "Erreur Serveur."});
+            apiResponse(res, status, err.message);
+            console.log(err.message);
         }
         else{
-            res.status(200);
-            res.json(tableTip);
+            apiResponse(res, status, "", tableTip);
         }
 
     });
 }
 
-exports.update_a_tableTip = (req, res) => {
-    TableTip.updateTableTip(req.params.id, new TableTip(req.body), (err, tableTip: TableTip) => {
+exports.update = (req, res) => {
+    let updated_tableTip: TableTip = new TableTip(req.body);
+
+    TableTip.updateTableTip(req.params.id, updated_tableTip, (err: Error, tableTip: TableTip, status: HttpStatusCode) => {
         if(err){
-            res.status(500);
-            console.log(err);
-            res.json({message: "Erreur Serveur."});
+            apiResponse(res, status, err.message);
         }
         else{
-            res.status(200);
-            res.json(tableTip);
+            TableTip.getOneTableTip(req.params.id, (err: Error, tableTip: TableTip, status: HttpStatusCode) => {
+                if(err){
+                    apiResponse(res, status, err.message);
+                }
+                else{
+                    updated_tableTip = tableTip;
+                    apiResponse(res, status, "Pourboire modifié avec succès", updated_tableTip);
+                }
+            });
         }
-
     });
 }
 
-exports.delete_a_tableTip = (req, res) => {
-    TableTip.deleteTableTip(req.params.id, (err, tableTip: TableTip) => {
+exports.delete = (req , res) => {
+    TableTip.deleteTableTip(req.params.id, (err: Error, tableTip: TableTip, status: HttpStatusCode) => {
         if(err){
-            res.status(500);
-            console.log(err);
-            res.json({message: "Erreur Serveur."});
+            apiResponse(res, status, err.message);
         }
         else{
-            res.status(200);
-            res.json({ message: 'TableTip successfully deleted' });
+            apiResponse(res, status, "Pourboire supprimé avec succès");
         }
 
     });

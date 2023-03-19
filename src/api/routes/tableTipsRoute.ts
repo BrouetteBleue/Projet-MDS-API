@@ -2,7 +2,12 @@ module.exports = (server) => {
     const tableTipController = require("../controllers/tableTipController");
 
     server.route("/tabletips")
-    .get(tableTipController.list_all_tableTips)
-    .post(tableTipController.create_a_tableTip);
+    .get(tableTipController.findAll)
+    .post(tableTipController.create)
+
+    server.route("/tabletip/:id")
+    .get(tableTipController.findOne)
+    .put(tableTipController.update)
+    .delete(tableTipController.delete)
 
 }

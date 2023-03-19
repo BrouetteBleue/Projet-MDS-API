@@ -1,6 +1,5 @@
 import { db } from '../config/database'
 import { Table } from './tableModel'
-import { Service } from './serviceModel'
 
 class TableTip {
 
@@ -75,11 +74,21 @@ class TableTip {
 
     static getAllTableTips = async (callback: Function) => {
 
-        db.query('SELECT * FROM tableTips JOIN restauranttable ON tableTips.id_restaurantTable = restaurantTable.id JOIN services ON tableTips.id_service = services.id', (err, result) => {
+        db.query('SELECT tip.`tips`,tip.`id_restaurantTable`,`id_service`,tip.`created_at`,tip.`modified_at`, tabl.name FROM tableTips tip JOIN restauranttable tabl ON tip.id_restaurantTable = tabl.id JOIN services s ON tip.id_service = s.id', (err, result) => {
             if(err) {
-                callback(err, null)
+                callback(err, null, 500)
             } else {
-                callback(null, result)
+                // on crée un objet table pour chaque table
+                 for(let i = 0; i < result.length; i++){ 
+                    let table = new Table(result[i].id_restaurantTable, result[i].name);
+                    result[i].table = table;
+                }
+                // ensuite on nettoie l'ojet pour ne pas avoir de doublons
+                result.forEach((element: any) => {
+                    delete element.id_restaurantTable;
+                    delete element.name;
+                });
+                callback(null, result , 200)
             }
         })
 
@@ -87,11 +96,25 @@ class TableTip {
 
     static getOneTableTip = async (id: number, callback: Function) => {
 
-        db.query('SELECT * FROM tabletips WHERE id = ?', [id], (err, result) => {
+        db.query('SELECT tip.`tips`,tip.`id_restaurantTable`,`id_service`,tip.`created_at`,tip.`modified_at`, tabl.name FROM tableTips tip JOIN restauranttable tabl ON tip.id_restaurantTable = tabl.id JOIN services s ON tip.id_service = s.id WHERE tip.id = ?', [id], (err, result) => {
             if(err) {
-                callback(err, null)
-            } else {
-                callback(null, result)
+                callback(err, null, 500)
+            }
+            else if(result.length == 0) {
+                callback(new Error("Pourboire introuvable"), null, 404)
+            }
+            else {
+                // on crée un objet table pour chaque table
+                 for(let i = 0; i < result.length; i++){ 
+                    let table = new Table(result[i].id_restaurantTable, result[i].name);
+                    result[i].table = table;
+                }
+                // ensuite on nettoie l'ojet pour ne pas avoir de doublons
+                result.forEach((element: any) => {
+                    delete element.id_restaurantTable;
+                    delete element.name;
+                });
+                callback(null, result, 200)
             }
         })
 
@@ -102,9 +125,9 @@ class TableTip {
             
             db.query('INSERT INTO tabletips (tips, id_restaurantTable, id_service) VALUES (?, ?, ?)', [newTableTip.tips, newTableTip.table, newTableTip.service], (err: Error, result: TableTip) => {
                 if(err) {
-                    callback(err, null)
+                    callback(err, null, 500)
                 } else {
-                    callback(null, result)
+                    callback(null, result, 201)
                 }
             })
     
@@ -114,9 +137,13 @@ class TableTip {
             
             db.query('UPDATE tabletips SET tips = ?, id_restaurantTable = ?, id_service = ? WHERE id = ?', [updatedTableTip.tips, updatedTableTip.table, updatedTableTip.service, id], (err, result) => {
                 if(err) {
-                    callback(err, null)
-                } else {
-                    callback(null, result)
+                    callback(err, null , 500)
+                }
+                else if(result.affectedRows == 0) {
+                    callback(new Error("Ce pourboire n'existe pas"), null, 404)
+                }
+                else {
+                    callback(null, result, 200)
                 }
             })
     
@@ -124,11 +151,15 @@ class TableTip {
 
     static deleteTableTip = async (id: number, callback: Function) => {
 
-        db.query('DELETE FROM tabletips WHERE id = ?', [id], (err, result) => {
+        db.query('DELETE FROM tabletips WHERE id = ?', [id], (err: Error, result) => {
             if(err) {
-                callback(err, null)
-            } else {
-                callback(null, result)
+                callback(err, null, 500)
+            } 
+            else if(result.affectedRows == 0) {
+                callback(new Error("Ce pourboire n'existe pas"), null, 404)
+            }
+            else {
+                callback(null, result, 200)
             }
         })
 
