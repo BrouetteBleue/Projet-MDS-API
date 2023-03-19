@@ -1,4 +1,5 @@
 import { db } from '../config/database'
+import { Service } from './serviceModel'
 
 class User {
 
@@ -148,6 +149,93 @@ class User {
         })
     }
 
+    static getUsersByServiceId(id: number, callback: Function) {
+        db.query('SELECT U.* FROM users U INNER JOIN serviceusers SU ON U.id = SU.id_user WHERE SU.id_service = ?', [id], (err, result) => {
+            if (err) {
+                callback(err, null, 500);
+            }
+            else if (result.length == 0) {
+                callback(new Error("Aucun utilisateur trouvé"), null, 404);
+            }
+            else {
+                callback(null, result, 200);
+            }
+        });
+    }
+
+    static addUserToService(serviceId: number, userId: number, callback: Function) {
+    
+        User.userExists(userId, (err, userExists: Boolean, result) => {
+            if (err) {
+                callback(err, null, 500);
+            }
+            else if (!userExists) {
+                callback(new Error("L'utilisateur n'existe pas"), null, 400);
+            }
+            else { 
+                Service.isUserAssignedToService(serviceId, userId, (err,isAssigned: Boolean, result) => {
+                    if (err) {
+                        callback(err, null, 500);
+                    }
+                    else if (isAssigned) {
+                        callback(new Error("L'utilisateur est déjà assigné à ce service"), null, 404);
+                    }
+                    else {
+                        db.query('INSERT INTO serviceusers (id_service, id_user) VALUES (?, ?)', [serviceId, userId], (err, result) => {
+                            if (err) {
+                                callback(err, null, 500);
+                            } else {
+                                callback(null, result, 201);
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    }
+
+    // Remove a user from a specific service
+    static removeUserFromService(serviceId: number, userId: number, callback: Function) {
+        db.query('DELETE FROM serviceusers WHERE id_service = ? AND id_user = ?', [serviceId, userId], (err, result) => {
+            if (err) {
+                callback(err, 500);
+            }
+            else if (result.affectedRows == 0) {
+                callback(new Error("L'utilisateur n'est pas assigné à ce service"), 404);
+            }
+            else {
+                callback(null, 200);
+            }
+        });
+    }
+
+    // Get a specific user from a specific service
+    static getUserFromService(serviceId: number, userId: number, callback: Function) {
+        db.query('SELECT U.* FROM users U INNER JOIN serviceusers SU ON U.id = SU.id_user WHERE SU.id_service = ? AND SU.id_user = ?', [serviceId, userId], (err, result) => {
+            if (err) {
+                callback(err, null, 500);
+            } else if (result.length == 0) {
+                callback(new Error("Aucun utilisateur trouvé pour ce service"), null, 404);
+            } else {
+                callback(null, result[0], 200);
+            }
+        });
+    }
+
+    // Check if a user exists
+    static userExists(userId: number, callback: Function) {
+        db.query('SELECT * FROM users WHERE id = ?', [userId], (err, result) => {
+            if (err) {
+                callback(err, false, 500);
+            } 
+            else if (result.length == 0) {
+                callback(null, false, 404);
+            }
+            else {
+                callback(null, true, 200);
+            }
+        });
+    }
 
 }
 export { User }
