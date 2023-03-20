@@ -10,4 +10,7 @@ module.exports = (server) => {
     .put(serviceController.update)
     .delete(serviceController.delete);
 
+    server.route("/service/:id/tips")
+    .get(serviceController.findAllTipsFromService);
+
 }

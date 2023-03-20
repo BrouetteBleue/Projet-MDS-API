@@ -1,7 +1,6 @@
 import { HttpStatusCode } from 'axios';
 import apiResponse from '../config/utils';
 import { Service } from '../models/serviceModel';
-import { User } from '../models/userModel';
 
 exports.findAll = (req, res) => {
 
@@ -61,6 +60,18 @@ exports.delete = (req, res) => {
         }
         else{
             apiResponse(res, status, "Service supprimé avec succès");
+        }
+    });
+}
+
+// get all tips for a service
+exports.findAllTipsFromService = (req, res) => {
+    Service.getTipsByService(req.params.id ,(err: Error, tips, status: HttpStatusCode) => {
+        if(err){
+            apiResponse(res, status, err.message);
+        }
+        else{
+            apiResponse(res, status, "", tips);
         }
     });
 }

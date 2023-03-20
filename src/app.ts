@@ -35,6 +35,9 @@ serviceUsersRoute(server);
 const tipPaymentRoute = require("./api/routes/tipPaymentRoute");
 tipPaymentRoute(server);
 
+const statsRoute = require("./api/routes/statsRoute");
+statsRoute(server);
+
 
 server.listen(port, hostname, () => {
     console.log(`Notre application Node est démarée sur : http://localhost:${port} `);

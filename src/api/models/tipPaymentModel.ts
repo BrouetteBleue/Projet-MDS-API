@@ -172,31 +172,21 @@ class TipPayment {
             }
         })
     }
-    
 
-
-
-    //  static getAllTableTips = async (callback: Function) => {
-
-    //     db.query('SELECT tip.`tips`,tip.`id_restaurantTable`,`id_service`,tip.`created_at`,tip.`modified_at`, tabl.name FROM tableTips tip JOIN restauranttable tabl ON tip.id_restaurantTable = tabl.id JOIN services s ON tip.id_service = s.id', (err, result) => {
-    //         if(err) {
-    //             callback(err, null, 500)
-    //         } else {
-    //             // on crée un objet table pour chaque table
-    //              for(let i = 0; i < result.length; i++){ 
-    //                 let table = new Table(result[i].id_restaurantTable, result[i].name);
-    //                 result[i].table = table;
-    //             }
-    //             // ensuite on nettoie l'ojet pour ne pas avoir de doublons
-    //             result.forEach((element: any) => {
-    //                 delete element.id_restaurantTable;
-    //                 delete element.name;
-    //             });
-    //             callback(null, result , 200)
-    //         }
-    //     })
-
-    // }
+    // static to get sum of tips for a user
+    static async getSumTipsForUser(id: number, callback: Function) {
+        db.query('SELECT SUM(amount) as total FROM tipsPayments WHERE id_user = ?', [id], (err, result) => {
+            if(err) {
+                callback(err, null, 500)
+            }
+            else if(result[0].total == null || result[0].total == 0) {
+                callback(new Error("L'utilisateur n'a recu aucun pourboire."), null, 400)
+            }
+            else {
+                callback(null, result, 200)
+            }
+        })
+    }
 
 }
 export {TipPayment} 

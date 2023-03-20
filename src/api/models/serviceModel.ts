@@ -1,5 +1,6 @@
 import { db } from '../config/database'
 import { User } from './userModel'
+import { Table } from './tableModel'
 
 class Service {
 
@@ -143,6 +144,31 @@ class Service {
         })
     }
 
+    // static get tips by service
+    static getTipsByService = async (service: number, callback: Function) => {
+        db.query('SELECT tip.`tips`,tip.`id_restaurantTable`,`id_service`,tip.`created_at`,tip.`modified_at`, tabl.name FROM tableTips tip JOIN restauranttable tabl ON tip.id_restaurantTable = tabl.id JOIN services s ON tip.id_service = s.id WHERE tip.id_service = ?', [service], (err, result) => {
+            if(err) {
+                callback(err, null, 500)
+            }
+            else if(result.length == 0) {
+                callback(new Error("Aucun pourboire pour ce service"), null, 404)
+            }
+            else {
+                // on crée un objet table pour chaque table
+                for(let i = 0; i < result.length; i++){
+                    let table = new Table(result[i].id_restaurantTable, result[i].name);
+                    result[i].table = table;
+                }
+                // ensuite on nettoie l'ojet pour ne pas avoir de doublons
+                result.forEach((element: any) => {
+                    delete element.id_restaurantTable;
+                    delete element.name;
+                });
+                callback(null, result, 200)
+            }
+        })
+    }
+
     // Get all services for a specific user
     static getServicesByUserId(userId: number, callback: Function) {
         db.query('SELECT S.* FROM services S INNER JOIN serviceusers SU ON S.id = SU.id_service WHERE SU.id_user = ?', [userId], (err, result) => {
@@ -170,6 +196,21 @@ class Service {
                 callback(null, true, 200);
             }
         });
+    }
+
+    // static to know if servise exist
+    static ServiceExist(id: number, callback: Function) {
+        db.query('SELECT * FROM services WHERE id = ?', [id], (err, result) => {
+            if(err) {
+                callback(err, false, 500)
+            }
+            else if(result.length == 0) {
+                callback(new Error("Ce service n'existe pas."), false, 404)
+            }
+            else {
+                callback(null, true, 200)
+            }
+        })
     }
 
 
