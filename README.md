@@ -1,9 +1,46 @@
 # Projet-MDS-API
 
-oui
+# Gestion des pourboires pour un restaurant
 
-https://gist.github.com/capywebformations/693dc50eece73ddda7c991887920eea8
+Ce projet est une application de gestion des pourboires pour un restaurant. Il permet de suivre les pourboires reçus par les serveurs et de gérer les paiements effectués à partir des pourboires accumulés.
 
-https://www.figma.com/proto/kTIXf3BuUPkAywpgxR2UuE/Indy-Pourboire-VFinal?page-id=11%3A9160&node-id=230%3A11152&viewport=241%2C48%2C0.12&scaling=scale-down&starting-point-node-id=152%3A6364&show-proto-sidebar=1
+## Fonctionnalités
 
-https://dbdiagram.io/d/627cdf737f945876b6060f9c
+- Gérer les tables du restaurant
+- Suivre les pourboires reçus par les serveurs pour chaque service
+- Répartition des pourboires entre les serveurs participant à un service
+- Gérer les paiements effectués à partir des pourboires accumulés
+- Calculer le solde disponible pour chaque serveur
+
+## Installation
+
+### 1. Clonez ce dépôt :
+
+#### git clone https://github.com/BrouetteBleue/Projet-MDS-API.git
+
+### 2. Installez les dépendances du projet :
+
+#### cd src
+#### npm install
+
+### 3. Configurez la base de données :
+
+#### en créant le fichier d'environnement .env basé sur le modèle ".env.sample" 
+
+(Des informations supplémentaires concernant l'utilisation des variables d'environnment dans ce projet sonts disponibles dans un README du dossier config)
+
+## 4. Démarrez l'application :
+
+#### npm start
+
+## Utilisation
+
+Utilisez l'API pour interagir avec les données des tables, des pourboires et des paiements. Vous pouvez appeler les méthodes appropriées dans les modèles pour réaliser des opérations CRUD.
+
+## Auteur
+
+Brouette Bleue
+
+## Licence
+
+Ce projet est sous licence MIT. Voir le fichier `LICENSE` pour plus de détails.
