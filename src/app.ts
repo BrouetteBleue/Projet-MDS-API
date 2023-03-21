@@ -3,6 +3,7 @@ const express = require("express");
 import dotenv from "dotenv";// load environment variables from a .env file into process.env
 import config from "./api/config/config";
 import { User } from "./api/models/userModel";
+
  
 dotenv.config({path: '../.env'}); // path to your .env file 
 
@@ -16,9 +17,19 @@ const caca = new User(null);
 const pipi = config.PORT;
 
 
-server.use(express.urlencoded());
-server.use(express.json());
+server.use(express.urlencoded())
+    .use(express.json())
+
+const serviceRoute = require("./api/routes/serviceRoute");
+serviceRoute(server);
+
+const userRoute = require("./api/routes/userRoute");
+userRoute(server);
+
+const tableTipRoute = require("./api/routes/tableTipsRoute");
+tableTipRoute(server);
+
 
 server.listen(port, hostname, () => {
-    console.log("environnement de node = "+pipi);
+    console.log(`Notre application Node est démarée sur : http://localhost:${port} `);
 }) 
