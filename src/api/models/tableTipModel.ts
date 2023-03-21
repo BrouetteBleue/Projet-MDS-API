@@ -1,4 +1,5 @@
 import { db } from '../config/database'
+import { Service } from './serviceModel'
 import { Table } from './tableModel'
 
 class TableTip {
@@ -122,15 +123,23 @@ class TableTip {
 
 
     static createTableTip = async (newTableTip: TableTip, callback: Function) => {
-            
-            db.query('INSERT INTO tabletips (tips, id_restaurantTable, id_service) VALUES (?, ?, ?)', [newTableTip.tips, newTableTip.table, newTableTip.service], (err: Error, result: TableTip) => {
+            Service.ServiceExist(newTableTip.service, (err: Error, serviceExist: Boolean,result: any) => {
                 if(err) {
-                    callback(err, null, 500)
-                } else {
-                    callback(null, result, 201)
+                    callback(err, 500)
+                }
+                else if(!serviceExist) {
+                    callback(new Error("Ce service n'existe pas"), 404)
+                }
+                else {
+                    db.query('INSERT INTO tabletips (tips, id_restaurantTable, id_service) VALUES (?, ?, ?)', [newTableTip.tips, newTableTip.table, newTableTip.service], (err2: Error, result: TableTip) => {
+                        if(err) {
+                            callback(err2, 500)
+                        } else {
+                            callback(null, 201)
+                        }
+                    })
                 }
             })
-    
         }
 
     static updateTableTip = async (id: number, updatedTableTip: TableTip, callback: Function) => {
@@ -164,5 +173,76 @@ class TableTip {
         })
 
     }
+    
+    static getSumOfTips = async (callback: Function) => {        
+        db.query('SELECT SUM(tips) AS total FROM tabletips', (err, result) => {
+            if(err) {
+                callback(err, null, 500)
+            } else {
+                callback(null, result , 200)
+            }
+        })
+    }
+
+    static getSumOfTipsByMonth = async (month: number, callback: Function) => {
+        if(month < 1 || month > 12){
+            callback(new Error("Le mois doit être compris entre 1 et 12"), null, 400)
+        }else{
+            db.query('SELECT SUM(tips) AS total FROM tabletips WHERE MONTH(created_at) = ?', [month], (err, result) => {
+                if(err) {
+                    callback(err, null, 500)
+                }
+                else if(result[0].total == null || result[0].total == 0) {
+                    callback(new Error("Aucun pourboire n'a été enregistré ce mois-ci"), null, 404)
+                }
+                else {
+                    callback(null, result , 200)
+                }
+            })
+        } 
+    }
+
+    static getAvailableTipsByMonth = async (month: number, callback: Function) => {
+        if(month < 1 || month > 12){
+            callback(new Error("Le mois doit être compris entre 1 et 12"), null, 400)
+        }else{
+            db.query('SELECT (SELECT COALESCE(SUM(tips), 0) FROM tabletips WHERE MONTH(`created_at`) = ? ) - (SELECT COALESCE(SUM(amount), 0) FROM tipspayments WHERE MONTH(`created_at`) = ?) AS Available_tips;', [month,month], (err, result) => {
+                if(err) {
+                    callback(err, null, 500)
+                }
+                else if(result[0].Available_tips == null) {
+                    callback(new Error("Aucun pourboire n'a été enregistré ce mois-ci"), null, 404)
+                }
+                else {
+                    callback(null, result , 200)
+                }
+            })
+        } 
+    }
+    
+    static getSumOfTipsByService = async (service: number, callback: Function) => {
+        Service.ServiceExist(service, (err: Error, serviceExist: Boolean,result: any) => {
+            if(err) {
+                callback(err,result, 500)
+            }
+            else if(!serviceExist) {
+                callback(new Error("Ce service n'existe pas"),result, 404)
+            }
+            else {
+                db.query('SELECT SUM(tips) AS total FROM tabletips WHERE id_service = ?', [service], (err, result) => {
+                    if(err) {
+                        callback(err, null, 500)
+                    }
+                    else if(result[0].total == null || result[0].total == 0) {
+                        callback(new Error("Aucun pourboire n'a été enregistré pour ce service"), null, 404)
+                    }
+                    else {
+                        callback(null, result , 200)
+                    }
+                })
+            }
+        })
+    }
+
 }
 export {TableTip}

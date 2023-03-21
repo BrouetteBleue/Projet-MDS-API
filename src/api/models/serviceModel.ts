@@ -1,5 +1,6 @@
 import { db } from '../config/database'
 import { User } from './userModel'
+import { Table } from './tableModel'
 
 class Service {
 
@@ -78,76 +79,52 @@ class Service {
     static getAllServices(callback: Function) {
         db.query('SELECT * FROM services', (err, result) => {
             if(err) {
-                callback(err, null)
+                callback(err, null, 500)
             } else {
-                callback(null, result)
+                callback(null, result, 200)
             }
         })
     }
-
-    // get all services TEST
-    // static getAllServicesTest(callback: Function) {
-    //     db.query('SELECT * FROM services', (err, result) => {
-    //         if(err) {
-    //             callback(err, null)
-    //         } else {
-    //             db.query('SELECT * FROM users', (err, result2) => {
-    //                 if(err) {
-    //                     callback(err, null)
-    //                 } else {
-    //                     let services: Service[] = []
-    //                     for(let i = 0; i < result.length; i++) {
-    //                         let service = new Service(result[i])
-    //                         let users: User[] = []
-    //                         for(let j = 0; j < result2.length; j++) {
-    //                             let user = new User(result2[j])
-    //                             if(user.serviceId == service.id) {
-    //                                 users.push(user)
-    //                             }
-    //                         }
-    //                         service.users = users
-    //                         services.push(service)
-    //                     }
-    //                     callback(null, services)
-    //                 }
-    //             })
-            
-    //             callback(null, result)
-    //         }
-    //     })
-    // }
-
 
     // get service by id
 
     static getServiceById(id: number, callback: Function) {
         db.query('SELECT * FROM services WHERE id = ?', [id], (err, result) => {
             if(err) {
-                callback(err, null)
-            } else {
-                callback(null, result)
+                callback(err, null, 500)
+            }
+            else if(result.length == 0) {
+                callback(new Error("service introuvable"), null, 404)
+            } 
+            else {
+                callback(null, result, 200)
             }
         })
     }
 
     // create service
     static createService(service: Service, callback: Function) {
-        db.query('INSERT INTO services SET ?', [service], (err, result) => {
+        db.query('INSERT INTO services (shiftType, shiftClosed) VALUES (?,?)', [service._shiftType, service._shiftClosed], (err, result) => {
             if(err) {
-                callback(err, null)
-            } else {
-                callback(null, result)
+                callback(err, null, 500)
+            }
+            else {
+                callback(null, result, 201)
             }
         })
     }
 
     // update service
-    static updateService(service: Service, callback: Function) {
-        db.query('UPDATE services SET ? WHERE id = ?', [service, service.id], (err, result) => {
+    static updateService(id: number, service: Service, callback: Function) {
+        db.query('UPDATE services SET shiftType = ? , shiftClosed = ? WHERE id = ?', [service._shiftType, service._shiftClosed, id], (err, result) => {
             if(err) {
-                callback(err, null)
-            } else {
-                callback(null, result)
+                callback(err, null, 500)
+            }
+            else if(result.affectedRows == 0) {
+                    callback(new Error("Ce service n'existe pas"), null, 404)
+                }
+            else {
+                callback(null, result, 200)
             }
         })
     }
@@ -156,9 +133,105 @@ class Service {
     static deleteService(id: number, callback: Function) {
         db.query('DELETE FROM services WHERE id = ?', [id], (err, result) => {
             if(err) {
-                callback(err, null)
+                callback(err, 500)
+            } 
+            else if(result.affectedRows == 0) {
+                callback(new Error("Ce service n'existe pas"), 404)
+            }
+            else {
+                callback(null, 200)
+            }
+        })
+    }
+
+    static getTipsByService = async (service: number, callback: Function) => {
+        db.query('SELECT tip.`tips`,tip.`id_restaurantTable`,`id_service`,tip.`created_at`,tip.`modified_at`, tabl.name FROM tableTips tip JOIN restauranttable tabl ON tip.id_restaurantTable = tabl.id JOIN services s ON tip.id_service = s.id WHERE tip.id_service = ?', [service], (err, result) => {
+            if(err) {
+                callback(err, null, 500)
+            }
+            else if(result.length == 0) {
+                callback(new Error("Aucun pourboire pour ce service"), null, 404)
+            }
+            else {
+                // on crée un objet table pour chaque table
+                for(let i = 0; i < result.length; i++){
+                    let table = new Table(result[i].id_restaurantTable, result[i].name);
+                    result[i].table = table;
+                }
+                // ensuite on nettoie l'ojet pour ne pas avoir de doublons
+                result.forEach((element: any) => {
+                    delete element.id_restaurantTable;
+                    delete element.name;
+                });
+                callback(null, result, 200)
+            }
+        })
+    }
+
+    static getServicesByUserId(userId: number, callback: Function) {
+        db.query('SELECT S.* FROM services S INNER JOIN serviceusers SU ON S.id = SU.id_service WHERE SU.id_user = ?', [userId], (err, result) => {
+            if (err) {
+                callback(err, null, 500);
+            }
+            else if (result.length == 0) {
+                callback(new Error("Aucun service trouvé"), null, 404);
+            }
+            else {
+                callback(null, result, 200);
+            }
+        });
+    }
+
+    static getServicesByDate(date: string, callback: Function) {
+        db.query("SELECT * FROM services WHERE DATE(created_at) = ?", [date], (err, result) => {
+            if (err) {
+                callback(err, null, 500);
+            } else if (result.length == 0) {
+                callback(new Error("Aucun service trouvé pour cette date"), null, 404);
             } else {
-                callback(null, result)
+                callback(null, result, 200);
+            }
+        });
+    }
+
+    static isUserAssignedToService(serviceId: number, userId: number, callback: Function) {
+        db.query('SELECT * FROM serviceusers WHERE id_service = ? AND id_user = ?', [serviceId, userId], (err, result) => {
+            if (err) {
+                callback(err, false, 500);
+            }
+            else if (result.length == 0) {
+                callback(null, false, 404);
+            }
+            else {
+                callback(null, true, 200);
+            }
+        });
+    }
+
+    static ServiceExist(id: number, callback: Function) {
+        db.query('SELECT * FROM services WHERE id = ?', [id], (err, result) => {
+            if(err) {
+                callback(err, false, 500)
+            }
+            else if(result.length == 0) {
+                callback(new Error("Ce service n'existe pas."), false, 404)
+            }
+            else {
+                callback(null, true, 200)
+            }
+        })
+    }
+
+    static closeService(id: number, callback: Function) {
+        db.query('UPDATE services SET shiftClosed = ? WHERE id = ?', [true, id], (err, result) => {
+            if(err) {
+                callback(err, 500)
+            }
+            else if(result.affectedRows == 0) {
+                callback(new Error("Ce service n'existe pas"), 404)
+            }
+            else {               
+                callback(null, 200)
             }
         })
     }

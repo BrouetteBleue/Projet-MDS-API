@@ -1,8 +1,5 @@
 import { TableTip } from "../models/tableTipModel";
-import { Table } from "../models/tableModel";
-import { exit } from "process";
 import apiResponse from "../config/utils";
-import { log } from "console";
 import { HttpStatusCode } from "axios";
 
 exports.findAll = (req, res) => {
@@ -41,7 +38,7 @@ exports.create = (req, res) => {
         }
 
 
-        TableTip.createTableTip(new_tableTip, (err: Error, tableTip: TableTip, status: HttpStatusCode) => {
+        TableTip.createTableTip(new_tableTip, (err: Error, status: HttpStatusCode) => {
             if(err){
                 console.log(err);
                 apiResponse(res, status, err.message);
@@ -100,4 +97,3 @@ exports.delete = (req , res) => {
 
     });
 }
-

@@ -16,6 +16,7 @@ interface ENV {
     DATABASE: string | undefined;
     PORT: number | undefined;
     HOSTNAME: string | undefined;
+    JWT_KEY: string | undefined;
 }
 
 interface Config {
@@ -26,6 +27,7 @@ interface Config {
     DATABASE: string;
     PORT: number;
     HOSTNAME: string;
+    JWT_KEY: string;
 }
 
 // Loading process.env as ENV interface like :
@@ -40,7 +42,7 @@ const getConfig = (): ENV => {
     PASSWORD: process.env.PASSWORD,
     DATABASE: process.env.DATABASE,
     HOSTNAME: process.env.HOSTNAME,
-
+    JWT_KEY: process.env.JWT_KEY,
   };
 };
 
