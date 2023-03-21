@@ -64,7 +64,7 @@ exports.delete = (req, res) => {
     });
 }
 
-// get all tips for a service
+
 exports.findAllTipsFromService = (req, res) => {
     Service.getTipsByService(req.params.id ,(err: Error, tips, status: HttpStatusCode) => {
         if(err){
@@ -75,3 +75,25 @@ exports.findAllTipsFromService = (req, res) => {
         }
     });
 }
+
+exports.findServicesByDate = (req, res) => {
+    Service.getServicesByDate(req.params.date, (err: Error, services, status: HttpStatusCode) => {
+        if (err) {
+            apiResponse(res, status, err.message);
+        } else {
+            apiResponse(res, status, "Services récupérés pour la date spécifiée", { services });
+        }
+    });
+};
+
+// close service 
+exports.closeService = (req, res) => {
+    Service.closeService(req.params.id, (err: Error, status: HttpStatusCode) => {
+        if (err) {
+            apiResponse(res, status, err.message);
+        } else {
+            apiResponse(res, status, "Le service a été fermé avec succès et tout les utilisateurs présent dans ce service ont vu leur solde crédité.");
+        }
+    });
+}
+

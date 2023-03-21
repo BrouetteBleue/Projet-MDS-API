@@ -3,7 +3,6 @@ import apiResponse  from "../config/utils";
 import { HttpStatusCode } from "axios";
 import { User } from "../models/userModel";
 
-// get all services from one user
 exports.findAllServicesFromUser = (req, res) => {
     Service.getServicesByUserId(req.params.id,(err: Error, service: Service, status: HttpStatusCode) => {
         if(err){
@@ -36,7 +35,6 @@ exports.removeUserFromService = (req, res) => {
     });
 }
 
-// get all users from one service
 exports.findAllUsersFromService = (req, res) => {
     User.getUsersByServiceId(req.params.id, (err: Error, users: User, status: HttpStatusCode) => {
         if(err){
@@ -48,7 +46,6 @@ exports.findAllUsersFromService = (req, res) => {
     });
 }
 
-// get one user from one service
 exports.findUserInService = (req, res) => {
     User.getUserFromService(req.params.idService, req.params.idUser, (err: Error, user: User, status: HttpStatusCode) => {
         if (err) {
@@ -58,3 +55,4 @@ exports.findUserInService = (req, res) => {
         }
     });
 }
+

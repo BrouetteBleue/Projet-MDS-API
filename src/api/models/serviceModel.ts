@@ -144,7 +144,6 @@ class Service {
         })
     }
 
-    // static get tips by service
     static getTipsByService = async (service: number, callback: Function) => {
         db.query('SELECT tip.`tips`,tip.`id_restaurantTable`,`id_service`,tip.`created_at`,tip.`modified_at`, tabl.name FROM tableTips tip JOIN restauranttable tabl ON tip.id_restaurantTable = tabl.id JOIN services s ON tip.id_service = s.id WHERE tip.id_service = ?', [service], (err, result) => {
             if(err) {
@@ -169,7 +168,6 @@ class Service {
         })
     }
 
-    // Get all services for a specific user
     static getServicesByUserId(userId: number, callback: Function) {
         db.query('SELECT S.* FROM services S INNER JOIN serviceusers SU ON S.id = SU.id_service WHERE SU.id_user = ?', [userId], (err, result) => {
             if (err) {
@@ -179,6 +177,18 @@ class Service {
                 callback(new Error("Aucun service trouvé"), null, 404);
             }
             else {
+                callback(null, result, 200);
+            }
+        });
+    }
+
+    static getServicesByDate(date: string, callback: Function) {
+        db.query("SELECT * FROM services WHERE DATE(created_at) = ?", [date], (err, result) => {
+            if (err) {
+                callback(err, null, 500);
+            } else if (result.length == 0) {
+                callback(new Error("Aucun service trouvé pour cette date"), null, 404);
+            } else {
                 callback(null, result, 200);
             }
         });
@@ -198,7 +208,6 @@ class Service {
         });
     }
 
-    // static to know if servise exist
     static ServiceExist(id: number, callback: Function) {
         db.query('SELECT * FROM services WHERE id = ?', [id], (err, result) => {
             if(err) {
@@ -209,6 +218,20 @@ class Service {
             }
             else {
                 callback(null, true, 200)
+            }
+        })
+    }
+
+    static closeService(id: number, callback: Function) {
+        db.query('UPDATE services SET shiftClosed = ? WHERE id = ?', [true, id], (err, result) => {
+            if(err) {
+                callback(err, 500)
+            }
+            else if(result.affectedRows == 0) {
+                callback(new Error("Ce service n'existe pas"), 404)
+            }
+            else {               
+                callback(null, 200)
             }
         })
     }

@@ -135,19 +135,19 @@ class User {
         })
     }
 
-    static deleteUser(id: number, callback: Function) {
-        db.query('DELETE FROM users WHERE id = ?', [id], (err, result) => {
-            if(err){
-                callback(err,500)
-            }
-            else if(result.affectedRows == 0) {
-                callback(new Error("Utilisateur introuvable"), 404)
-            }
-            else{
-                callback(null,200)
-            }
-        })
-    }
+    // static deleteUser(id: number, callback: Function) {
+    //     db.query('DELETE FROM users WHERE id = ?', [id], (err, result) => {
+    //         if(err){
+    //             callback(err,500)
+    //         }
+    //         else if(result.affectedRows == 0) {
+    //             callback(new Error("Utilisateur introuvable"), 404)
+    //         }
+    //         else{
+    //             callback(null,200)
+    //         }
+    //     })
+    // }
 
     static getUsersByServiceId(id: number, callback: Function) {
         db.query('SELECT U.* FROM users U INNER JOIN serviceusers SU ON U.id = SU.id_user WHERE SU.id_service = ?', [id], (err, result) => {
@@ -194,7 +194,6 @@ class User {
         });
     }
 
-    // Remove a user from a specific service
     static removeUserFromService(serviceId: number, userId: number, callback: Function) {
         db.query('DELETE FROM serviceusers WHERE id_service = ? AND id_user = ?', [serviceId, userId], (err, result) => {
             if (err) {
@@ -209,7 +208,6 @@ class User {
         });
     }
 
-    // Get a specific user from a specific service
     static getUserFromService(serviceId: number, userId: number, callback: Function) {
         db.query('SELECT U.* FROM users U INNER JOIN serviceusers SU ON U.id = SU.id_user WHERE SU.id_service = ? AND SU.id_user = ?', [serviceId, userId], (err, result) => {
             if (err) {
@@ -222,7 +220,6 @@ class User {
         });
     }
 
-    // Check if a user exists
     static userExists(userId: number, callback: Function) {
         db.query('SELECT * FROM users WHERE id = ?', [userId], (err, result) => {
             if (err) {
@@ -233,6 +230,120 @@ class User {
             }
             else {
                 callback(null, true, 200);
+            }
+        });
+    }
+
+    static getAvailableSolde(user: number,callback: Function) {
+
+        if (!user) {
+            callback(new Error("Veuillez indiquer un utilisateur"), null, 500);
+            return;
+        }
+
+        let totalTips = 0;
+        let totalPayments = 0;
+
+        // get tout ses services
+        db.query('SELECT * FROM serviceusers WHERE id_user = ?', [user], (err, servicesUsers) => {
+            if (err) {
+                callback(err, null, 500);
+                return;
+            }
+            console.log("service users = "+servicesUsers);
+            
+            const serviceCount = servicesUsers.length;
+            console.log("service count = "+serviceCount);
+            
+
+            if (serviceCount === 0) {
+                calculateSolde();
+                return;
+            }
+
+            let servicesProcessed = 0;
+
+            // pour chaque service
+            servicesUsers.forEach(serviceUser => {
+                const serviceId = serviceUser.id_service;
+
+                // on récupère les tips
+                db.query('SELECT * FROM tabletips WHERE id_service = ?', [serviceId], (err, tipsResult) => {
+                    if (err) {
+                        callback(err, null, 500);
+                        return;
+                    }
+                    console.log("tips des services = "+tipsResult);
+                    // on fait la somme des tips
+                    let serviceTips = 0;
+                    for (const tip of tipsResult) {
+                        serviceTips += tip.tips;
+                    }
+
+                    // on récupère le nombre d'utilisateurs du service
+                    db.query('SELECT COUNT(*) as user_count FROM serviceusers WHERE id_service = ?', [serviceId], (err, usersResult) => {
+                        if (err) {
+                            callback(err, null, 500);
+                            return;
+                        }
+                        console.log("nb d'utilisateurs = "+usersResult);
+                        const userCount = usersResult[0].user_count;
+
+                        // on divise les tips par le nombre d'utilisateurs
+                        totalTips += serviceTips / userCount;
+
+                        servicesProcessed++;
+
+                        if (servicesProcessed === serviceCount) {
+                            calculateSolde();
+                        }
+                    });
+                });
+            });
+        });
+
+        function calculateSolde() {
+            // on tout les paiements a l'utilisateur
+            db.query('SELECT * FROM tipspayments WHERE id_user = ?', [user], (err, paymentsResult) => {
+                if (err) {
+                    callback(err, null, 500);
+                    return;
+                }
+                console.log("paiements = "+paymentsResult);
+                // on fait la somme
+                for (const payment of paymentsResult) {
+                    totalPayments += payment.amount;
+                }
+
+                // et on soustrait
+                const availableBalance = totalTips - totalPayments;
+
+                callback(null, availableBalance, 200);
+            });
+        }
+    }
+
+    static anonymiseUser(user: number, callback: Function) {
+
+        // on get tt les utilisateur anonyme "anonyme-"
+        db.query('SELECT COUNT(id) as id FROM users WHERE firstname LIKE "Anonyme-%" OR lastname LIKE "Anonyme-%"', (err, result) => {
+            if (err) {
+                callback(err, 500);
+            } 
+            else {
+                let idAnonyme = result[0]["id"];
+                db.query('UPDATE users SET firstname = ?, lastname = ?, active = ? WHERE id = ?', ["Anonyme-"+idAnonyme, "Anonyme-"+idAnonyme, false, user ], (err, result) => {
+                    if (err) {
+                        callback(err, 500);
+                    }
+                    else if(result.affectedRows == 0) {
+                        callback(new Error("L'utilisateur n'existe pas"), 404);
+                    }
+                    else {
+                        callback(null, 200);
+                    }
+                });
+
             }
         });
     }

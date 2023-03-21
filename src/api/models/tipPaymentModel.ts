@@ -173,7 +173,6 @@ class TipPayment {
         })
     }
 
-    // static to get sum of tips for a user
     static async getSumTipsForUser(id: number, callback: Function) {
         db.query('SELECT SUM(amount) as total FROM tipsPayments WHERE id_user = ?', [id], (err, result) => {
             if(err) {

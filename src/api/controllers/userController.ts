@@ -55,14 +55,36 @@ exports.update = (req: Request, res: Response) => {
 }
 
 
-exports.delete = (req: Request, res: Response) => {
-    User.deleteUser(req.params.id, (err: Error, status: HttpStatusCode) => {
+// exports.delete = (req: Request, res: Response) => {
+//     User.deleteUser(req.params.id, (err: Error, status: HttpStatusCode) => {
+//         if (err) {
+//             apiResponse(res, status, err.message);
+//         }
+//         else {
+//             apiResponse(res, status, "Utilisateur supprimé avec succès");
+//         }
+
+//     });
+// }
+
+exports.getSolde = (req: Request, res: Response) => {
+    User.getAvailableSolde(req.params.id, (err: Error, solde: number, status: HttpStatusCode) => {
         if (err) {
             apiResponse(res, status, err.message);
         }
         else {
-            apiResponse(res, status, "Utilisateur supprimé avec succès");
+            apiResponse(res, status, "Voici le solde disponible de cet utilisateur", solde);
         }
+    });
+}
 
+exports.deleteUser = (req: Request, res: Response) => {
+    User.anonymiseUser(req.params.id, (err: Error, status: HttpStatusCode) => {
+        if (err) {
+            apiResponse(res, status, err.message);
+        }
+        else {
+            apiResponse(res, status, "Utilisateur anonymisé avec succès");
+        }
     });
 }

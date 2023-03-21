@@ -7,5 +7,6 @@ declare namespace NodeJS {
     DATABASE: string;
     PORT: number; // jsp quoi faire ca bug 
     HOSTNAME: string;
+    JWT_KEY: string;
   }
 } 

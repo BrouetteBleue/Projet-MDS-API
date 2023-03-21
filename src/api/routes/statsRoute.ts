@@ -1,17 +1,22 @@
 module.exports = (server) => {
     const statsController = require("../controllers/statsController");
+    const jwtMiddleware = require("../middlewares/jwtMiddleware");
 
     server.route("/stats/sumtips")
-    .get(statsController.getSumTips)
+    .get(jwtMiddleware.verifyToken,statsController.getSumTips)
 
     server.route("/stats/sumtips/:month")
-    .get(statsController.getSumTipsByMonth)
+    .get(jwtMiddleware.verifyToken,statsController.getSumTipsByMonth)
 
     server.route("/stats/availabletips/:month")
-    .get(statsController.getAvailableTipsByMonth)
+    .get(jwtMiddleware.verifyToken,statsController.getAvailableTipsByMonth)
 
     server.route("/stats/sumtipsbyuser/:id")
-    .get(statsController.getSumTipsByUser)
+    .get(jwtMiddleware.verifyToken,statsController.getSumTipsByUser)
+
+    server.route("/stats/sumtipsbyservice/:id")
+    .get(jwtMiddleware.verifyToken,statsController.getSumTipsByService)
+
     
 
 }

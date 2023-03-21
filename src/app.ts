@@ -2,20 +2,14 @@ const express = require("express");
 //const dotenv = require('dotenv');
 import dotenv from "dotenv";// load environment variables from a .env file into process.env
 import config from "./api/config/config";
-import { User } from "./api/models/userModel";
 
  
 dotenv.config({path: '../.env'}); // path to your .env file 
 
-const hostname = process.env.HOSTNAME;
-const port = process.env.PORT;
+const hostname = config.HOSTNAME;
+const port = config.PORT;
 
 const server = express();
-
-const caca = new User(null);
-
-const pipi = config.PORT;
-
 
 server.use(express.urlencoded())
     .use(express.json())
@@ -38,6 +32,8 @@ tipPaymentRoute(server);
 const statsRoute = require("./api/routes/statsRoute");
 statsRoute(server);
 
+const adminRoute = require("./api/routes/adminRoute");
+adminRoute(server);
 
 server.listen(port, hostname, () => {
     console.log(`Notre application Node est démarée sur : http://localhost:${port} `);
